@@ -13,7 +13,7 @@
     <form hidden onsubmit='return apply_users_filter()'>
         <br>
         Users filter, comma separated standings place:<br>
-        <input style='width: 45%;'></input><button>Apply</button><br>
+        <button type='button' onclick='all_users_filter()'>All</button><input style='width: 45%;'></input><button>Apply</button><br>
         <br>
     </form>
     <div id='0'></div>
@@ -190,6 +190,15 @@ function apply_users_filter() {
     users_filter = users_filter.split(',').map(function(i) { return i | 0 })
     plot(users_filter)
     return false
+}
+function all_users_filter() {
+    var users = contest.users
+    var users_filter = []
+    for (var i = 1; i <= users.length; ++i)
+        users_filter.push(i)
+    var input = document.getElementsByTagName('input')[0]
+    input.value = users_filter.join(',')
+    input.select()
 }
 (function() {
     var params = new URLSearchParams(location.search)
