@@ -81,7 +81,9 @@ var contests = [
         ],
     },
 ]
-function init(contest, test_cases, users) {
+function init(contest) {
+    var test_cases = contest.test_cases
+    var users = contest.users
     for (var i = 0; i < users.length; ++i) {
         var user = users[i]
         user.name = (i + 1) + '. ' + user.name
@@ -104,7 +106,9 @@ function init(contest, test_cases, users) {
         test_case.push(best)
     }
 }
-function plot(contest, test_cases, users, users_filter) {
+function plot(contest, users_filter) {
+    var test_cases = contest.test_cases
+    var users = contest.users
     for (var pi = 0; pi < contest.parameters.length; ++pi) {
         var parameter = contest.parameters[pi]
         var parameter_get = []
@@ -186,8 +190,10 @@ if (params.has('contest')) {
         var request = new XMLHttpRequest()
         request.onreadystatechange = function() {
             if (this.readyState === 4 && this.status === 200) {
-                init(contest, this.response.test_cases, this.response.users)
-                plot(contest, this.response.test_cases, this.response.users, users_filter)
+                contest.test_cases = this.response.test_cases
+                contest.users = this.response.users
+                init(contest)
+                plot(contest, users_filter)
             }
         }
         request.responseType = 'json'
