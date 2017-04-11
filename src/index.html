@@ -11,8 +11,6 @@
     Web scraping the system test of topcoder and visualize charts.
     You can compare scores per major parameter of test cases.<br>
     <br>
-    Don't charts legends include you?
-    See this page URL. Please edit "users_filter" of GET parameter that hyphen separated standings place.<br>
     <div id='0'></div>
     <div id='1'></div>
     <div id='2'></div>
@@ -183,19 +181,13 @@ function plot(users_filter) {
         if (contest) {
             outer_url.textContent = contest.name
             outer_url.setAttribute('href', contest.outer_url)
-            var users_filter = contest.users_filter
-            if (params.has('users_filter')) {
-                users_filter = params.get('users_filter').split('-').map(function(i) {
-                    return i | 0
-                })
-            }
             var request = new XMLHttpRequest()
             request.onreadystatechange = function() {
                 if (this.readyState === 4 && this.status === 200) {
                     contest.test_cases = this.response.test_cases
                     contest.users = this.response.users
                     init()
-                    plot(users_filter)
+                    plot(contest.users_filter)
                 }
             }
             request.responseType = 'json'
@@ -209,7 +201,6 @@ function plot(users_filter) {
         a.textContent = c.name
         var params = new URLSearchParams()
         params.set('contest', c.url_get_parameter.toLowerCase())
-        params.set('users_filter', c.users_filter.join('-'))
         a.setAttribute('href', '?' + params)
         container.appendChild(a)
         container.appendChild(document.createElement('br'))
