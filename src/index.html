@@ -81,7 +81,7 @@ var contests = [
         ],
     },
 ]
-function plot(contest, users_filter, test_cases, users) {
+function init(contest, test_cases, users) {
     for (var i = 0; i < users.length; ++i) {
         var user = users[i]
         user.name = (i + 1) + '. ' + user.name
@@ -101,6 +101,8 @@ function plot(contest, users_filter, test_cases, users) {
                 user.scores[i] = contest.large_score_is_better ? score / best : best / score
         }
     }
+}
+function plot(contest, test_cases, users, users_filter) {
     var plot_n = 0
     for (var pi = 0; pi < contest.parameters.length; ++pi) {
         var parameter = contest.parameters[pi]
@@ -182,8 +184,10 @@ if (params.has('contest')) {
         }
         var request = new XMLHttpRequest()
         request.onreadystatechange = function() {
-            if (this.readyState === 4 && this.status === 200)
-                plot(contest, users_filter, this.response.test_cases, this.response.users)
+            if (this.readyState === 4 && this.status === 200) {
+                init(contest, this.response.test_cases, this.response.users)
+                plot(contest, this.response.test_cases, this.response.users, users_filter)
+            }
         }
         request.responseType = 'json'
         request.open('GET', contest.data_url)
