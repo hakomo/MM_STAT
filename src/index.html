@@ -1,12 +1,12 @@
 <!doctype html>
 <meta charset='utf-8'>
-<title>MM_STAT</title>
+<title>NOW LOADING...</title>
 <meta http-equiv='x-ua-compatible' content='ie=edge'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 
 <body style='margin: 8px 20px;'>
 <div id='container' style='margin: auto; max-width: 800px;'>
-    <h1>MM_STAT</h1>
+    <h1>NOW LOADING...</h1>
     This page is <a id='outer_url' target='_blank'></a> unofficial statistics.
     Web scraping the system test of topcoder and visualize charts.
     You can compare scores per major parameter of test cases.<br>
@@ -31,7 +31,7 @@ var contests = [
     {   name: 'topcoder MM93 CrossStitch',
         outer_url: 'https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=16887&pm=14543',
         data_url: 'data/topcoderMM93CrossStitch.json',
-        url_get_parameter: 'CrossStitch',
+        url_get_parameter_and_title: 'CrossStitch',
         large_score_is_better: true,
         users_filter: [1, 2, 3, 4, 5, 6, 7],
         parameters: [
@@ -185,7 +185,7 @@ function plot(users_filter) {
     if (params.has('contest')) {
         var contest_name = params.get('contest').toLowerCase()
         contest = contests.find(function(contest) {
-            return contest.url_get_parameter.toLowerCase() === contest_name
+            return contest.url_get_parameter_and_title.toLowerCase() === contest_name
         })
         if (contest) {
             outer_url.textContent = contest.name
@@ -197,19 +197,27 @@ function plot(users_filter) {
                     contest.users = this.response.users
                     init()
                     plot(contest.users_filter)
+                    document.title = contest.url_get_parameter_and_title + ' | MM_STAT'
+                    document.getElementsByTagName('h1')[0].textContent = document.title
                 }
             }
             request.responseType = 'json'
             request.open('GET', contest.data_url)
             request.send()
+        } else {
+            document.title = 'MM_STAT'
+            document.getElementsByTagName('h1')[0].textContent = document.title
         }
+    } else {
+        document.title = 'MM_STAT'
+        document.getElementsByTagName('h1')[0].textContent = document.title
     }
     for (var i = 0; i < contests.length; ++i) {
         var c = contests[i]
         var a = document.createElement('a')
         a.textContent = c.name
         var params = new URLSearchParams()
-        params.set('contest', c.url_get_parameter.toLowerCase())
+        params.set('contest', c.url_get_parameter_and_title.toLowerCase())
         a.setAttribute('href', '?' + params)
         container.appendChild(a)
         container.appendChild(document.createElement('br'))
