@@ -83,6 +83,47 @@ var contests = [
             },
         ],
     },
+
+    {   name: 'topcoder MM92 Lighting',
+        outer_url: 'https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=16857&pm=14485',
+        data_url: 'data/topcoderMM92Lighting.json',
+        url_get_parameter_and_title: 'Lighting',
+        large_score_is_better: true,
+        users_filter: [1, 2, 3, 4, 5],
+        parameters: [
+            {   name: 'Size of the room S',
+                get: function(map, D, L) {
+                    var S = map.length
+                    return S
+                },
+            },
+            {   name: 'Light distance D',
+                get: function(map, D, L) {
+                    return D
+                },
+            },
+            {   name: 'Max number of lights L',
+                get: function(map, D, L) {
+                    return L
+                },
+            },
+            {   name: 'Wall density',
+                get: function(map, D, L) {
+                    var S = map.length
+                    var n = 0
+                    for (var y = 0; y < S; ++y)
+                        for (var x = 0; x < S; ++x)
+                            n += map[y][x] === '#'
+                    return n / (S * S)
+                },
+            },
+            {   name: 'Best score',
+                get: function() {
+                    return arguments[arguments.length - 1]
+                },
+            },
+        ],
+    },
 ]
 var contest
 function init() {
