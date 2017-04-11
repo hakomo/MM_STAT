@@ -81,7 +81,8 @@ var contests = [
         ],
     },
 ]
-function init(contest) {
+var contest
+function init() {
     var test_cases = contest.test_cases
     var users = contest.users
     for (var i = 0; i < users.length; ++i) {
@@ -106,7 +107,7 @@ function init(contest) {
         test_case.push(best)
     }
 }
-function plot(contest, users_filter) {
+function plot(users_filter) {
     var test_cases = contest.test_cases
     var users = contest.users
     for (var pi = 0; pi < contest.parameters.length; ++pi) {
@@ -175,7 +176,7 @@ function plot(contest, users_filter) {
 var params = new URLSearchParams(location.search)
 if (params.has('contest')) {
     var contest_name = params.get('contest').toLowerCase()
-    var contest = contests.find(function(contest) {
+    contest = contests.find(function(contest) {
         return contest.url_get_parameter.toLowerCase() === contest_name
     })
     if (contest) {
@@ -192,8 +193,8 @@ if (params.has('contest')) {
             if (this.readyState === 4 && this.status === 200) {
                 contest.test_cases = this.response.test_cases
                 contest.users = this.response.users
-                init(contest)
-                plot(contest, users_filter)
+                init()
+                plot(users_filter)
             }
         }
         request.responseType = 'json'
@@ -202,12 +203,12 @@ if (params.has('contest')) {
     }
 }
 for (var i = 0; i < contests.length; ++i) {
-    var contest = contests[i]
+    var c = contests[i]
     var a = document.createElement('a')
-    a.textContent = contest.name
+    a.textContent = c.name
     var params = new URLSearchParams()
-    params.set('contest', contest.url_get_parameter.toLowerCase())
-    params.set('users_filter', contest.users_filter.join('-'))
+    params.set('contest', c.url_get_parameter.toLowerCase())
+    params.set('users_filter', c.users_filter.join('-'))
     a.setAttribute('href', '?' + params)
     container.appendChild(a)
     container.appendChild(document.createElement('br'))
