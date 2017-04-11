@@ -111,16 +111,25 @@ function plot(users_filter) {
     for (var pi = 0; pi < contest.parameters.length; ++pi) {
         var parameter = contest.parameters[pi]
         var parameter_get = []
+        var p_is_int = true
+        var p_min = 1e9
+        var p_max = -1e9
         var indicies = []
         for (var i = 0; i < test_cases.length; ++i) {
             var test_case = test_cases[i]
-            parameter_get.push(parameter.get.apply(null, test_case))
+            var p = parameter.get.apply(null, test_case)
+            if ((p | 0) !== p)
+                p_is_int = false
+            p_min = Math.min(p_min, p)
+            p_max = Math.max(p_max, p)
+            parameter_get.push(p)
             indicies.push(i)
         }
         indicies.sort(function(i, j) {
             return parameter_get[i] - parameter_get[j]
         })
-        var GRID_SIZE = Math.ceil(test_cases.length / 20)
+        var GRID_SIZE = Math.ceil(Math.max(test_cases.length / 20,
+            p_is_int ? test_cases.length / (p_max - p_min + 1) : 0))
         var xs = []
         for (var i = 0; i < test_cases.length; i += GRID_SIZE) {
             var x = 0
