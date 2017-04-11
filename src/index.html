@@ -87,6 +87,7 @@ function init(contest, test_cases, users) {
         user.name = (i + 1) + '. ' + user.name
     }
     for (var i = 0; i < test_cases.length; ++i) {
+        var test_case = test_cases[i]
         var best = 0
         for (var j = 0; j < users.length; ++j) {
             var user = users[j]
@@ -100,6 +101,7 @@ function init(contest, test_cases, users) {
             if (score !== 0)
                 user.scores[i] = contest.large_score_is_better ? score / best : best / score
         }
+        test_case.push(best)
     }
 }
 function plot(contest, test_cases, users, users_filter) {
