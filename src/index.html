@@ -10,7 +10,12 @@
     This page is <a id='outer_url' target='_blank'></a> unofficial statistics.
     Web scraping the system test of topcoder and visualize charts.
     You can compare scores per major parameter of test cases.<br>
-    <br>
+    <form hidden onsubmit='return apply_users_filter()'>
+        <br>
+        Users filter, comma separated standings place:<br>
+        <input style='width: 45%;'></input><button>Apply</button><br>
+        <br>
+    </form>
     <div id='0'></div>
     <div id='1'></div>
     <div id='2'></div>
@@ -180,6 +185,12 @@ function plot(users_filter) {
         })
     }
 }
+function apply_users_filter() {
+    var users_filter = document.getElementsByTagName('input')[0].value
+    users_filter = users_filter.split(',').map(function(i) { return i | 0 })
+    plot(users_filter)
+    return false
+}
 (function() {
     var params = new URLSearchParams(location.search)
     if (params.has('contest')) {
@@ -199,6 +210,8 @@ function plot(users_filter) {
                     plot(contest.users_filter)
                     document.title = contest.url_get_parameter_and_title + ' | MM_STAT'
                     document.getElementsByTagName('h1')[0].textContent = document.title
+                    document.getElementsByTagName('input')[0].value = contest.users_filter.join(',')
+                    document.forms[0].hidden = false
                 }
             }
             request.responseType = 'json'
