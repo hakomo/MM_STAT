@@ -1,0 +1,223 @@
+<!doctype html>
+<meta charset='utf-8'>
+<title>MM_STAT</title>
+<meta http-equiv='x-ua-compatible' content='ie=edge'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+
+<body style='margin: 8px 20px;'>
+<div id='container' style='margin: auto; max-width: 800px;'>
+    <h1>MM_STAT</h1>
+    This page is <a id='outer_url' target='_blank'></a> unofficial statistics.
+    Web scraping the system test of topcoder and visualize charts.
+    You can compare scores per major parameter of test cases.<br>
+    <br>
+    Don't charts legends include you?
+    See this page URL. Please edit "users_filter" of GET parameter that hyphen separated standings place.<br>
+    <div id='0'></div>
+    <div id='1'></div>
+    <div id='2'></div>
+    <div id='3'></div>
+    <div id='4'></div>
+    <div id='5'></div>
+    <div id='6'></div>
+    <div id='7'></div>
+    <div id='8'></div>
+    <div id='9'></div>
+    <br>
+    Other contests statistics:<br>
+</div>
+
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script>
+var contests = [
+    // {   name: 'topcoder MM* ContestName',
+    //     outer_url: 'https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=16887&pm=14543',
+    //     data_url: 'data/topcoderMM*ContestName.json',
+    //     url_get_parameter: 'ContestName',
+    //     large_score_is_better: true,
+    //     users_filter: [1, 2, 3, 4, 5],
+    //     parameters: [
+    //         {   name: 'Parameter name',
+    //             get: function() {
+    //             },
+    //         },
+    //     ],
+    // },
+
+    {   name: 'topcoder MM93 CrossStitch',
+        outer_url: 'https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=16887&pm=14543',
+        data_url: 'data/topcoderMM93CrossStitch.json',
+        url_get_parameter: 'CrossStitch',
+        large_score_is_better: true,
+        users_filter: [1, 2, 3, 4, 5, 6, 7],
+        parameters: [
+            {   name: 'Size of the pattern S',
+                get: function(pattern) {
+                    var S = pattern.length
+                    return S
+                },
+            },
+            {   name: 'Number of colors C',
+                get: function(pattern) {
+                    var S = pattern.length
+                    var C = 0
+                    for (var y = 0; y < S; ++y) {
+                        for (var x = 0; x < S; ++x) {
+                            if (pattern[y][x] !== '.') {
+                                var color = pattern[y].charCodeAt(x) - 'a'.charCodeAt(0)
+                                C = Math.max(C, color + 1)
+                            }
+                        }
+                    }
+                    return C
+                },
+            },
+            {   name: 'Square root of sum of squares of stitches numbers',
+                get: function(pattern) {
+                    var S = pattern.length
+                    var C = 0
+                    var n = []
+                    for (var y = 0; y < S; ++y) {
+                        for (var x = 0; x < S; ++x) {
+                            if (pattern[y][x] !== '.') {
+                                var color = pattern[y].charCodeAt(x) - 'a'.charCodeAt(0)
+                                C = Math.max(C, color + 1)
+                                n[color] = (n[color] | 0) + 2
+                            }
+                        }
+                    }
+                    var s = 0
+                    for (var color = 0; color < C; ++color)
+                        s += n[color] * n[color]
+                    return Math.sqrt(s)
+                },
+            },
+        ],
+    },
+]
+function plot(contest, users_filter, test_cases, users) {
+    for (var i = 0; i < users.length; ++i) {
+        var user = users[i]
+        user.name = (i + 1) + '. ' + user.name
+    }
+    for (var i = 0; i < test_cases.length; ++i) {
+        var best = 0
+        for (var j = 0; j < users.length; ++j) {
+            var user = users[j]
+            var score = user.scores[i]
+            if (score !== 0 && (best === 0 || (contest.large_score_is_better ? best < score : best > score)))
+                best = score
+        }
+        for (var j = 0; j < users.length; ++j) {
+            var user = users[j]
+            var score = user.scores[i]
+            if (score !== 0)
+                user.scores[i] = contest.large_score_is_better ? score / best : best / score
+        }
+    }
+    var plot_n = 0
+    for (var pi = 0; pi < contest.parameters.length; ++pi) {
+        var parameter = contest.parameters[pi]
+        var parameter_get = []
+        var indicies = []
+        for (var i = 0; i < test_cases.length; ++i) {
+            var test_case = test_cases[i]
+            parameter_get.push(parameter.get.apply(null, test_case))
+            indicies.push(i)
+        }
+        indicies.sort(function(i, j) {
+            return parameter_get[i] - parameter_get[j]
+        })
+        var GRID_SIZE = 50
+        var xs = []
+        for (var i = 0; i < test_cases.length; i += GRID_SIZE) {
+            var x = 0
+            for (var j = i; j < Math.min(i + GRID_SIZE, test_cases.length); ++j)
+                x += parameter_get[indicies[j]]
+            xs.push(x / (Math.min(i + GRID_SIZE, test_cases.length) - i))
+        }
+        var scoress = []
+        for (var i = 0; i < users.length; ++i)
+            scoress.push([])
+        for (var i = 0; i < test_cases.length; i += GRID_SIZE) {
+            for (var j = 0; j < users.length; ++j) {
+                var user = users[j]
+                var scores = user.scores
+                var score = 0
+                for (var k = i; k < Math.min(i + GRID_SIZE, test_cases.length); ++k)
+                    score += scores[indicies[k]]
+                scoress[j].push(score)
+            }
+        }
+        for (var i = 0; i < scoress[0].length; ++i) {
+            var best = 0
+            for (var j = 0; j < users.length; ++j)
+                best = Math.max(best, scoress[j][i])
+            for (var j = 0; j < users.length; ++j)
+                scoress[j][i] /= best
+        }
+        var graph = []
+        for (var i = 0; i < users.length; ++i) {
+            if (users_filter.indexOf(i + 1) >= 0) {
+                var user = users[i]
+                graph.push({
+                    x: xs,
+                    y: scoress[i],
+                    name: user.name,
+                })
+            }
+        }
+        Plotly.newPlot(pi + '', graph, {
+            xaxis: {
+                title: parameter.name,
+            },
+            yaxis: {
+                title: 'Score',
+            },
+        })
+    }
+}
+var params = new URLSearchParams(location.search)
+if (params.has('contest')) {
+    var contest_name = params.get('contest').toLowerCase()
+    var contest = contests.find(function(contest) {
+        return contest.url_get_parameter.toLowerCase() === contest_name
+    })
+    if (contest) {
+        outer_url.textContent = contest.name
+        outer_url.setAttribute('href', contest.outer_url)
+        var users_filter = contest.users_filter
+        if (params.has('users_filter')) {
+            users_filter = params.get('users_filter').split('-').map(function(i) {
+                return i | 0
+            })
+        }
+        var request = new XMLHttpRequest()
+        request.onreadystatechange = function() {
+            if (this.readyState === 4 && this.status === 200)
+                plot(contest, users_filter, this.response.test_cases, this.response.users)
+        }
+        request.responseType = 'json'
+        request.open('GET', contest.data_url)
+        request.send()
+    }
+}
+for (var i = 0; i < contests.length; ++i) {
+    var contest = contests[i]
+    var a = document.createElement('a')
+    a.textContent = contest.name
+    var params = new URLSearchParams()
+    params.set('contest', contest.url_get_parameter.toLowerCase())
+    params.set('users_filter', contest.users_filter.join('-'))
+    a.setAttribute('href', '?' + params)
+    container.appendChild(a)
+    container.appendChild(document.createElement('br'))
+}
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-51595485-1', 'hakomo.github.io');
+ga('send', 'pageview');
+</script>
+</body>
