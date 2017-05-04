@@ -1,6 +1,6 @@
 <!doctype html>
 <meta charset='utf-8'>
-<title>NOW LOADING...</title>
+<title>MM_STAT</title>
 <meta http-equiv='x-ua-compatible' content='ie=edge'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 
@@ -258,8 +258,7 @@ function all_users_filter() {
                     contest.users = this.response.users
                     init()
                     plot(contest.users_filter)
-                    document.title = contest.url_get_parameter_and_title + ' | MM_STAT'
-                    document.getElementsByTagName('h1')[0].textContent = document.title
+                    document.getElementsByTagName('h1')[0].textContent = contest.url_get_parameter_and_title
                     document.getElementsByTagName('input')[0].value = contest.users_filter.join(',')
                     document.forms[0].hidden = false
                 }
@@ -268,12 +267,10 @@ function all_users_filter() {
             request.open('GET', contest.data_url)
             request.send()
         } else {
-            document.title = 'MM_STAT'
-            document.getElementsByTagName('h1')[0].textContent = document.title
+            document.getElementsByTagName('h1')[0].textContent = 'MM_STAT'
         }
     } else {
-        document.title = 'MM_STAT'
-        document.getElementsByTagName('h1')[0].textContent = document.title
+        document.getElementsByTagName('h1')[0].textContent = 'MM_STAT'
     }
     for (var i = 0; i < contests.length; ++i) {
         var c = contests[i]
