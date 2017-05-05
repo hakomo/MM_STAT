@@ -6,7 +6,7 @@ import urllib.request
 import pyquery
 
 WEB_SCRAPING    = False
-CONTEST_PATH    = 'topcoderMM92Lighting'
+CONTEST_PATH    = 'topcoderTCO17MMR1GraphDrawing'
 
 DATA_PATH       = os.path.join(CONTEST_PATH, 'data')
 with open('settings.json') as f:
@@ -88,11 +88,17 @@ for test_case_id in test_case_ids:
         with open(os.path.join(DATA_PATH, 'test_cases', test_case_id + '.html')) as f:
             s = pyquery.PyQuery(f.read()).find('pre').text()
 
+        # lines = s.split('\n')
+        # test_cases.append([
+        #     lines[3:-2],
+        #     int(lines[-2].split('=')[1]),
+        #     int(lines[-1].split('=')[1]),
+        # ])
+
         lines = s.split('\n')
         test_cases.append([
-            lines[3:-2],
             int(lines[-2].split('=')[1]),
-            int(lines[-1].split('=')[1]),
+            { 'length': int(lines[-1].split('=')[1]) * 3 },
         ])
 
     except:

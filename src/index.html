@@ -33,6 +33,36 @@
 <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
 <script>
 var contests = [
+    {   name: 'topcoder TCO17MMR1 GraphDrawing',
+        outer_url: 'https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=16903&pm=14565',
+        data_url: 'data/topcoderTCO17MMR1GraphDrawing.json',
+        url_get_parameter_and_title: 'GraphDrawing',
+        large_score_is_better: true,
+        users_filter: [1, 2, 3, 4, 5],
+        parameters: [
+            {   name: 'Number of vertices NV',
+                get: function(NV, edges) {
+                    return NV
+                },
+            },
+            {   name: 'Number of edges NE',
+                get: function(NV, edges) {
+                    return edges.length / 3
+                },
+            },
+            {   name: 'NE / NV',
+                get: function(NV, edges) {
+                    return edges.length / 3 / NV
+                },
+            },
+            {   name: 'Best score',
+                get: function() {
+                    return arguments[arguments.length - 1]
+                },
+            },
+        ],
+    },
+
     {   name: 'topcoder MM93 CrossStitch',
         outer_url: 'https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=16887&pm=14543',
         data_url: 'data/topcoderMM93CrossStitch.json',
